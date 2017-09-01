@@ -1,0 +1,755 @@
+1) Find the albums recorded by the artist Queen.
+
+
+irb(main):023:0> ap Artist.where(name: "Queen")
+  Artist Exists (1.0ms)  SELECT  1 AS one FROM "artists" WHERE "artists"."name" = $1 LIMIT $2  [["name", "Queen"], ["LIMIT", 1]]
+  Artist Load (0.3ms)  SELECT "artists".* FROM "artists" WHERE "artists"."name" = $1  [["name", "Queen"]]
+[
+    [0] #<Artist:0x007fef14b6ae80> {
+                :id => 51,
+              :name => "Queen",
+        :created_at => Sun, 08 Jan 2006 22:57:01 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:10:22 UTC +00:00
+    }
+]
+
+irb(main):022:0* ap Album.where(artist_id: 51)
+  Album Exists (2.4ms)  SELECT  1 AS one FROM "albums" WHERE "albums"."artist_id" = $1 LIMIT $2  [["artist_id", 51], ["LIMIT", 1]]
+  Album Load (0.9ms)  SELECT "albums".* FROM "albums" WHERE "albums"."artist_id" = $1  [["artist_id", 51]]
+[
+    [0] #<Album:0x007fef14d32218> {
+                :id => 36,
+         :artist_id => 51,
+             :title => "Greatest Hits II",
+        :created_at => Wed, 30 Jan 2008 14:00:12 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:02 UTC +00:00
+    },
+    [1] #<Album:0x007fef14d320b0> {
+                :id => 185,
+         :artist_id => 51,
+             :title => "Greatest Hits I",
+        :created_at => Sat, 29 Dec 2007 12:02:13 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:02 UTC +00:00
+    },
+    [2] #<Album:0x007fef14d31f70> {
+                :id => 186,
+         :artist_id => 51,
+             :title => "News Of The World",
+        :created_at => Wed, 23 Jun 2010 20:50:06 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:02 UTC +00:00
+    }
+]
+=> nil
+
+
+2) Count how many tracks belong to the media type "Protected MPEG-4 video file".
+
+irb(main):010:0> Track.where(media_type_id: 4).count
+   (10.7ms)  SELECT COUNT(*) FROM "tracks" WHERE "tracks"."media_type_id" = $1  [["media_type_id", 4]]
+=> 7
+
+
+
+3) Find the genre with the name "Hip Hop/Rap".
+
+irb(main):015:0> ap Genre.where(name: "Hip Hop/Rap")
+  Genre Exists (1.9ms)  SELECT  1 AS one FROM "genres" WHERE "genres"."name" = $1 LIMIT $2  [["name", "Hip Hop/Rap"], ["LIMIT", 1]]
+  Genre Load (0.3ms)  SELECT "genres".* FROM "genres" WHERE "genres"."name" = $1  [["name", "Hip Hop/Rap"]]
+[
+    [0] #<Genre:0x007fef10d366f0> {
+                :id => 17,
+              :name => "Hip Hop/Rap",
+        :created_at => Sun, 20 Jan 2013 02:04:31 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:08 UTC +00:00
+    }
+]
+
+
+
+4) Count how many tracks belong to the "Hip Hop/Rap" genre
+
+irb(main):019:0> ap Track.where(genre_id: 17).count
+   (2.0ms)  SELECT COUNT(*) FROM "tracks" WHERE "tracks"."genre_id" = $1  [["genre_id", 17]]
+35
+
+
+
+5) Find the total amount of time required to listen to all the tracks in the database.
+
+
+irb(main):023:0> Track.sum("milliseconds")
+   (10.7ms)  SELECT SUM("tracks"."milliseconds") FROM "tracks"
+=> 1378575827
+
+
+6) Find the highest price of any track that has the media type "MPEG audio file".
+
+
+irb(main):042:0> ap MediaType.all
+  MediaType Exists (0.6ms)  SELECT  1 AS one FROM "media_types" LIMIT $1  [["LIMIT", 1]]
+  MediaType Load (0.6ms)  SELECT "media_types".* FROM "media_types"
+[
+    [0] #<MediaType:0x007fef17a5a5b0> {
+                :id => 1,
+              :name => "MPEG audio file",
+        :created_at => Fri, 24 Nov 2006 08:21:33 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:22 UTC +00:00
+    },
+    [1] #<MediaType:0x007fef17a5a470> {
+                :id => 2,
+              :name => "Protected AAC audio file",
+        :created_at => Sat, 15 Oct 2005 15:38:18 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:22 UTC +00:00
+    },
+    [2] #<MediaType:0x007fef17a5a2e0> {
+                :id => 3,
+              :name => "Protected MPEG-4 video file",
+        :created_at => Fri, 07 Dec 2007 13:17:17 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:22 UTC +00:00
+    },
+    [3] #<MediaType:0x007fef17a5a1a0> {
+                :id => 4,
+              :name => "Purchased AAC audio file",
+        :created_at => Sun, 10 Jun 2012 16:54:26 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:22 UTC +00:00
+    },
+    [4] #<MediaType:0x007fef17a5a060> {
+                :id => 5,
+              :name => "AAC audio file",
+        :created_at => Tue, 19 Jul 2011 19:21:12 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:22 UTC +00:00
+    }
+]
+=> nil
+irb(main):043:0> ap Track.where(media_type_id: 1).maximum("unit_price").to_f
+   (3.0ms)  SELECT MAX("tracks"."unit_price") FROM "tracks" WHERE "tracks"."media_type_id" = $1  [["media_type_id", 1]]
+0.99
+=> nil
+
+
+
+7) Find the name of the most expensive track that has the media type "MPEG audio file".
+
+irb(main):110:0> Track.where(media_type_id: 1).order(unit_price: :asc).first.name
+  Track Load (3.1ms)  SELECT  "tracks".* FROM "tracks" WHERE "tracks"."media_type_id" = $1 ORDER BY "tracks"."unit_price" ASC LIMIT $2  [["media_type_id", 1], ["LIMIT", 1]]
+=> "Put The Finger On You"
+
+
+8) Find the 2 oldest artists.
+
+
+irb(main):123:0> ap Artist.order(created_at: :asc).limit(2)
+  Artist Exists (0.4ms)  SELECT  1 AS one FROM "artists" LIMIT $1  [["LIMIT", 1]]
+  Artist Load (0.4ms)  SELECT  "artists".* FROM "artists" ORDER BY "artists"."created_at" ASC LIMIT $1  [["LIMIT", 2]]
+[
+    [0] #<Artist:0x007fef10f058a0> {
+                :id => 258,
+              :name => "Les Arts Florissants & William Christie",
+        :created_at => Fri, 13 Feb 2004 06:08:36 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:10:22 UTC +00:00
+    },
+    [1] #<Artist:0x007fef10f045e0> {
+                :id => 31,
+              :name => "Baby Consuelo",
+        :created_at => Mon, 16 Feb 2004 22:04:39 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:10:22 UTC +00:00
+    }
+]
+=> nil
+
+
+
+9) Find the least expensive track that has the genre "Electronica/Dance".
+
+
+irb(main):132:0> ap Track.where(genre_id: 15).order(unit_price: :asc).limit(1)
+  Track Exists (1.5ms)  SELECT  1 AS one FROM "tracks" WHERE "tracks"."genre_id" = $1 LIMIT $2  [["genre_id", 15], ["LIMIT", 1]]
+  Track Load (1.2ms)  SELECT  "tracks".* FROM "tracks" WHERE "tracks"."genre_id" = $1 ORDER BY "tracks"."unit_price" ASC LIMIT $2  [["genre_id", 15], ["LIMIT", 1]]
+[
+    [0] #<Track:0x007fef17368e78> {
+                   :id => 3319,
+             :album_id => 259,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "Instinto Colectivo",
+             :composer => nil,
+         :milliseconds => 300564,
+                :bytes => 12024875,
+           :unit_price => 0.99,
+           :created_at => Mon, 27 Sep 2004 22:40:29 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:15:04 UTC +00:00
+    }
+]
+
+
+
+10) Find all "MPEG autio file" tracks in the genre "Electronica/Dance".
+
+irb(main):143:0> ap MediaType.all
+  MediaType Exists (0.6ms)  SELECT  1 AS one FROM "media_types" LIMIT $1  [["LIMIT", 1]]
+  MediaType Load (0.5ms)  SELECT "media_types".* FROM "media_types"
+[
+    [0] #<MediaType:0x007fef17859a18> {
+                :id => 1,
+              :name => "MPEG audio file",
+        :created_at => Fri, 24 Nov 2006 08:21:33 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:22 UTC +00:00
+    },
+    [1] #<MediaType:0x007fef178598b0> {
+                :id => 2,
+              :name => "Protected AAC audio file",
+        :created_at => Sat, 15 Oct 2005 15:38:18 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:22 UTC +00:00
+    },
+    [2] #<MediaType:0x007fef17859748> {
+                :id => 3,
+              :name => "Protected MPEG-4 video file",
+        :created_at => Fri, 07 Dec 2007 13:17:17 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:22 UTC +00:00
+    },
+    [3] #<MediaType:0x007fef178595e0> {
+                :id => 4,
+              :name => "Purchased AAC audio file",
+        :created_at => Sun, 10 Jun 2012 16:54:26 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:22 UTC +00:00
+    },
+    [4] #<MediaType:0x007fef17859450> {
+                :id => 5,
+              :name => "AAC audio file",
+        :created_at => Tue, 19 Jul 2011 19:21:12 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:22 UTC +00:00
+    }
+]
+=> nil
+irb(main):144:0> ap Genre.all
+  Genre Exists (0.6ms)  SELECT  1 AS one FROM "genres" LIMIT $1  [["LIMIT", 1]]
+  Genre Load (0.6ms)  SELECT "genres".* FROM "genres"
+[
+    [ 0] #<Genre:0x007fef17821780> {
+                :id => 1,
+              :name => "Rock",
+        :created_at => Sun, 17 Feb 2008 12:06:26 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:08 UTC +00:00
+    },
+    [ 1] #<Genre:0x007fef17821640> {
+                :id => 2,
+              :name => "Jazz",
+        :created_at => Sun, 11 Jun 2006 22:16:36 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:08 UTC +00:00
+    },
+    [ 2] #<Genre:0x007fef178214d8> {
+                :id => 3,
+              :name => "Metal",
+        :created_at => Thu, 15 Nov 2012 10:40:49 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:08 UTC +00:00
+    },
+    [ 3] #<Genre:0x007fef17821398> {
+                :id => 4,
+              :name => "Alternative & Punk",
+        :created_at => Mon, 04 Mar 2013 00:20:35 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:08 UTC +00:00
+    },
+    [ 4] #<Genre:0x007fef17821258> {
+                :id => 5,
+              :name => "Rock And Roll",
+        :created_at => Fri, 25 Aug 2006 00:39:25 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:08 UTC +00:00
+    },
+    [ 5] #<Genre:0x007fef17821118> {
+                :id => 6,
+              :name => "Blues",
+        :created_at => Sun, 13 Mar 2011 07:33:57 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:08 UTC +00:00
+    },
+    [ 6] #<Genre:0x007fef17820fd8> {
+                :id => 7,
+              :name => "Latin",
+        :created_at => Fri, 06 Jun 2008 11:13:18 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:08 UTC +00:00
+    },
+    [ 7] #<Genre:0x007fef17820e70> {
+                :id => 8,
+              :name => "Reggae",
+        :created_at => Fri, 25 Nov 2005 11:00:53 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:08 UTC +00:00
+    },
+    [ 8] #<Genre:0x007fef17820d30> {
+                :id => 9,
+              :name => "Pop",
+        :created_at => Mon, 12 Jul 2010 20:04:53 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:08 UTC +00:00
+    },
+    [ 9] #<Genre:0x007fef17820bf0> {
+                :id => 10,
+              :name => "Soundtrack",
+        :created_at => Sat, 06 Jun 2009 16:55:48 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:08 UTC +00:00
+    },
+    [10] #<Genre:0x007fef17820ab0> {
+                :id => 11,
+              :name => "Bossa Nova",
+        :created_at => Mon, 04 Nov 2013 17:47:42 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:08 UTC +00:00
+    },
+    [11] #<Genre:0x007fef17820948> {
+                :id => 12,
+              :name => "Easy Listening",
+        :created_at => Mon, 04 Jan 2010 02:36:39 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:08 UTC +00:00
+    },
+    [12] #<Genre:0x007fef17820808> {
+                :id => 13,
+              :name => "Heavy Metal",
+        :created_at => Sun, 09 Jun 2013 11:39:27 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:08 UTC +00:00
+    },
+    [13] #<Genre:0x007fef178206c8> {
+                :id => 14,
+              :name => "R&B/Soul",
+        :created_at => Fri, 30 Jul 2004 05:06:53 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:08 UTC +00:00
+    },
+    [14] #<Genre:0x007fef17820358> {
+                :id => 15,
+              :name => "Electronica/Dance",
+        :created_at => Sun, 25 May 2008 12:13:42 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:08 UTC +00:00
+    },
+    [15] #<Genre:0x007fef178201c8> {
+                :id => 16,
+              :name => "World",
+        :created_at => Sat, 24 Jul 2004 12:29:29 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:08 UTC +00:00
+    },
+    [16] #<Genre:0x007fef17820088> {
+                :id => 17,
+              :name => "Hip Hop/Rap",
+        :created_at => Sun, 20 Jan 2013 02:04:31 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:08 UTC +00:00
+    },
+    [17] #<Genre:0x007fef1781bee8> {
+                :id => 18,
+              :name => "Science Fiction",
+        :created_at => Mon, 02 Aug 2004 15:40:12 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:08 UTC +00:00
+    },
+    [18] #<Genre:0x007fef1781bd58> {
+                :id => 19,
+              :name => "TV Shows",
+        :created_at => Sun, 05 Aug 2007 07:31:41 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:08 UTC +00:00
+    },
+    [19] #<Genre:0x007fef1781bc18> {
+                :id => 20,
+              :name => "Sci Fi & Fantasy",
+        :created_at => Thu, 23 Oct 2008 01:12:41 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:08 UTC +00:00
+    },
+    [20] #<Genre:0x007fef1781bab0> {
+                :id => 21,
+              :name => "Drama",
+        :created_at => Sun, 02 Nov 2008 03:41:13 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:08 UTC +00:00
+    },
+    [21] #<Genre:0x007fef1781b948> {
+                :id => 22,
+              :name => "Comedy",
+        :created_at => Sat, 31 Mar 2012 09:20:08 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:08 UTC +00:00
+    },
+    [22] #<Genre:0x007fef1781b808> {
+                :id => 23,
+              :name => "Alternative",
+        :created_at => Fri, 21 Apr 2006 10:08:22 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:08 UTC +00:00
+    },
+    [23] #<Genre:0x007fef1781b6c8> {
+                :id => 24,
+              :name => "Classical",
+        :created_at => Tue, 12 Oct 2010 17:26:41 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:08 UTC +00:00
+    },
+    [24] #<Genre:0x007fef1781b588> {
+                :id => 25,
+              :name => "Opera",
+        :created_at => Mon, 21 Aug 2006 02:26:50 UTC +00:00,
+        :updated_at => Wed, 29 Jan 2014 22:14:08 UTC +00:00
+    }
+]
+=> nil
+
+irb(main):145:0> ap Track.where(genre_id: 15).where(media_type_id: 1).count
+   (1.7ms)  SELECT COUNT(*) FROM "tracks" WHERE "tracks"."genre_id" = $1 AND "tracks"."media_type_id" = $2  [["genre_id", 15], ["media_type_id", 1]]
+28
+=> nil
+
+irb(main):146:0> ap Track.where(genre_id: 15).where(media_type_id: 1)
+  Track Exists (1.4ms)  SELECT  1 AS one FROM "tracks" WHERE "tracks"."genre_id" = $1 AND "tracks"."media_type_id" = $2 LIMIT $3  [["genre_id", 15], ["media_type_id", 1], ["LIMIT", 1]]
+  Track Load (1.5ms)  SELECT "tracks".* FROM "tracks" WHERE "tracks"."genre_id" = $1 AND "tracks"."media_type_id" = $2  [["genre_id", 15], ["media_type_id", 1]]
+[
+    [ 0] #<Track:0x007fef17002838> {
+                   :id => 3319,
+             :album_id => 259,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "Instinto Colectivo",
+             :composer => nil,
+         :milliseconds => 300564,
+                :bytes => 12024875,
+           :unit_price => 0.99,
+           :created_at => Mon, 27 Sep 2004 22:40:29 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:15:04 UTC +00:00
+    },
+    [ 1] #<Track:0x007fef170026f8> {
+                   :id => 3320,
+             :album_id => 259,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "Chapa o Coco",
+             :composer => nil,
+         :milliseconds => 143830,
+                :bytes => 5755478,
+           :unit_price => 0.99,
+           :created_at => Mon, 27 Sep 2004 22:40:29 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:15:04 UTC +00:00
+    },
+    [ 2] #<Track:0x007fef17002400> {
+                   :id => 3321,
+             :album_id => 259,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "Prostituta",
+             :composer => nil,
+         :milliseconds => 359000,
+                :bytes => 14362307,
+           :unit_price => 0.99,
+           :created_at => Mon, 27 Sep 2004 22:40:29 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:15:04 UTC +00:00
+    },
+    [ 3] #<Track:0x007fef17002270> {
+                   :id => 3322,
+             :album_id => 259,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "Eu So Queria Sumir",
+             :composer => nil,
+         :milliseconds => 269740,
+                :bytes => 10791921,
+           :unit_price => 0.99,
+           :created_at => Mon, 27 Sep 2004 22:40:29 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:15:04 UTC +00:00
+    },
+    [ 4] #<Track:0x007fef170020e0> {
+                   :id => 3323,
+             :album_id => 259,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "Tres Reis",
+             :composer => nil,
+         :milliseconds => 304143,
+                :bytes => 12168015,
+           :unit_price => 0.99,
+           :created_at => Mon, 27 Sep 2004 22:40:29 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:15:04 UTC +00:00
+    },
+    [ 5] #<Track:0x007fef17001fa0> {
+                   :id => 3324,
+             :album_id => 259,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "Um Lugar ao Sol",
+             :composer => nil,
+         :milliseconds => 212323,
+                :bytes => 8495217,
+           :unit_price => 0.99,
+           :created_at => Mon, 27 Sep 2004 22:40:29 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:15:04 UTC +00:00
+    },
+    [ 6] #<Track:0x007fef17001c30> {
+                   :id => 3325,
+             :album_id => 259,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "Batalha Naval",
+             :composer => nil,
+         :milliseconds => 285727,
+                :bytes => 11431382,
+           :unit_price => 0.99,
+           :created_at => Mon, 27 Sep 2004 22:40:29 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:15:04 UTC +00:00
+    },
+    [ 7] #<Track:0x007fef170017d0> {
+                   :id => 3327,
+             :album_id => 259,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "O Misterio do Samba",
+             :composer => nil,
+         :milliseconds => 226142,
+                :bytes => 9047970,
+           :unit_price => 0.99,
+           :created_at => Mon, 27 Sep 2004 22:40:29 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:15:04 UTC +00:00
+    },
+    [ 8] #<Track:0x007fef170015f0> {
+                   :id => 3328,
+             :album_id => 259,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "Armadura",
+             :composer => nil,
+         :milliseconds => 232881,
+                :bytes => 9317533,
+           :unit_price => 0.99,
+           :created_at => Mon, 27 Sep 2004 22:40:29 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:15:04 UTC +00:00
+    },
+    [ 9] #<Track:0x007fef170014b0> {
+                   :id => 3329,
+             :album_id => 259,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "Na Ladeira",
+             :composer => nil,
+         :milliseconds => 221570,
+                :bytes => 8865099,
+           :unit_price => 0.99,
+           :created_at => Mon, 27 Sep 2004 22:40:29 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:15:04 UTC +00:00
+    },
+    [10] #<Track:0x007fef170012f8> {
+                   :id => 3330,
+             :album_id => 259,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "Carimbo",
+             :composer => nil,
+         :milliseconds => 328751,
+                :bytes => 13152314,
+           :unit_price => 0.99,
+           :created_at => Mon, 27 Sep 2004 22:40:29 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:15:04 UTC +00:00
+    },
+    [11] #<Track:0x007fef17001168> {
+                   :id => 3331,
+             :album_id => 259,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "Catimbo",
+             :composer => nil,
+         :milliseconds => 254484,
+                :bytes => 10181692,
+           :unit_price => 0.99,
+           :created_at => Mon, 27 Sep 2004 22:40:29 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:15:04 UTC +00:00
+    },
+    [12] #<Track:0x007fef17001028> {
+                   :id => 3333,
+             :album_id => 259,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "Chega no Suingue",
+             :composer => nil,
+         :milliseconds => 221805,
+                :bytes => 8874509,
+           :unit_price => 0.99,
+           :created_at => Mon, 27 Sep 2004 22:40:29 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:15:04 UTC +00:00
+    },
+    [13] #<Track:0x007fef17000e98> {
+                   :id => 3334,
+             :album_id => 259,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "Mun-Ra",
+             :composer => nil,
+         :milliseconds => 274651,
+                :bytes => 10988338,
+           :unit_price => 0.99,
+           :created_at => Mon, 27 Sep 2004 22:40:29 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:15:04 UTC +00:00
+    },
+    [14] #<Track:0x007fef17000d58> {
+                   :id => 3335,
+             :album_id => 259,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "Freestyle Love",
+             :composer => nil,
+         :milliseconds => 318484,
+                :bytes => 12741680,
+           :unit_price => 0.99,
+           :created_at => Mon, 27 Sep 2004 22:40:29 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:15:04 UTC +00:00
+    },
+    [15] #<Track:0x007fef17000c18> {
+                   :id => 1456,
+             :album_id => 118,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "Stillness In Time",
+             :composer => "Toby Smith",
+         :milliseconds => 257097,
+                :bytes => 8644290,
+           :unit_price => 0.99,
+           :created_at => Thu, 01 May 2008 07:04:10 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:15:05 UTC +00:00
+    },
+    [16] #<Track:0x007fef17000ad8> {
+                   :id => 1463,
+             :album_id => 118,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "Journey To Arnhemland",
+             :composer => "Toby Smith/Wallis Buchanan",
+         :milliseconds => 322455,
+                :bytes => 10843832,
+           :unit_price => 0.99,
+           :created_at => Thu, 01 May 2008 07:04:10 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:15:05 UTC +00:00
+    },
+    [17] #<Track:0x007fef17000970> {
+                   :id => 1455,
+             :album_id => 118,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "Just Another Story",
+             :composer => "Toby Smith",
+         :milliseconds => 529684,
+                :bytes => 17582818,
+           :unit_price => 0.99,
+           :created_at => Thu, 01 May 2008 07:04:10 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:14:59 UTC +00:00
+    },
+    [18] #<Track:0x007fef17000808> {
+                   :id => 3326,
+             :album_id => 259,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "Todo o Carnaval tem seu Fim",
+             :composer => nil,
+         :milliseconds => 237426,
+                :bytes => 9499371,
+           :unit_price => 0.99,
+           :created_at => Mon, 27 Sep 2004 22:40:29 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:15:06 UTC +00:00
+    },
+    [19] #<Track:0x007fef170006c8> {
+                   :id => 3332,
+             :album_id => 259,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "Funk de Bamba",
+             :composer => nil,
+         :milliseconds => 237322,
+                :bytes => 9495184,
+           :unit_price => 0.99,
+           :created_at => Mon, 27 Sep 2004 22:40:29 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:15:06 UTC +00:00
+    },
+    [20] #<Track:0x007fef17000588> {
+                   :id => 1457,
+             :album_id => 118,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "Half The Man",
+             :composer => "Toby Smith",
+         :milliseconds => 289854,
+                :bytes => 9577679,
+           :unit_price => 0.99,
+           :created_at => Thu, 01 May 2008 07:04:10 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:14:59 UTC +00:00
+    },
+    [21] #<Track:0x007fef17000448> {
+                   :id => 1458,
+             :album_id => 118,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "Light Years",
+             :composer => "Toby Smith",
+         :milliseconds => 354560,
+                :bytes => 11796244,
+           :unit_price => 0.99,
+           :created_at => Thu, 01 May 2008 07:04:10 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:14:59 UTC +00:00
+    },
+    [22] #<Track:0x007fef17000308> {
+                   :id => 1459,
+             :album_id => 118,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "Manifest Destiny",
+             :composer => "Toby Smith",
+         :milliseconds => 382197,
+                :bytes => 12676962,
+           :unit_price => 0.99,
+           :created_at => Thu, 01 May 2008 07:04:10 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:14:59 UTC +00:00
+    },
+    [23] #<Track:0x007fef170001c8> {
+                   :id => 1460,
+             :album_id => 118,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "The Kids",
+             :composer => "Toby Smith",
+         :milliseconds => 309995,
+                :bytes => 10334529,
+           :unit_price => 0.99,
+           :created_at => Thu, 01 May 2008 07:04:10 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:14:59 UTC +00:00
+    },
+    [24] #<Track:0x007fef17000088> {
+                   :id => 1461,
+             :album_id => 118,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "Mr. Moon",
+             :composer => "Stuard Zender/Toby Smith",
+         :milliseconds => 329534,
+                :bytes => 11043559,
+           :unit_price => 0.99,
+           :created_at => Thu, 01 May 2008 07:04:10 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:14:59 UTC +00:00
+    },
+    [25] #<Track:0x007fef157efef8> {
+                   :id => 1462,
+             :album_id => 118,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "Scam",
+             :composer => "Stuart Zender",
+         :milliseconds => 422321,
+                :bytes => 14019705,
+           :unit_price => 0.99,
+           :created_at => Thu, 01 May 2008 07:04:10 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:14:59 UTC +00:00
+    },
+    [26] #<Track:0x007fef157efdb8> {
+                   :id => 1464,
+             :album_id => 118,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "Morning Glory",
+             :composer => "J. Kay/Jay Kay",
+         :milliseconds => 384130,
+                :bytes => 12777210,
+           :unit_price => 0.99,
+           :created_at => Thu, 01 May 2008 07:04:10 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:14:59 UTC +00:00
+    },
+    [27] #<Track:0x007fef157efc78> {
+                   :id => 1465,
+             :album_id => 118,
+             :genre_id => 15,
+        :media_type_id => 1,
+                 :name => "Space Cowboy",
+             :composer => "J. Kay/Jay Kay",
+         :milliseconds => 385697,
+                :bytes => 12906520,
+           :unit_price => 0.99,
+           :created_at => Thu, 01 May 2008 07:04:10 UTC +00:00,
+           :updated_at => Wed, 29 Jan 2014 22:14:59 UTC +00:00
+    }
+]
+=> nil
